@@ -10,8 +10,10 @@ namespace DevilInTheSky
 {
     class GameFrame
     {
+        public Stopwatch watch = new Stopwatch();
+        public TimeSpan elapsedTime = new TimeSpan();
+
         //Var's for the messages
-        Stopwatch watch = new Stopwatch();
         int messageTimer = 0;
         int switchMessage = 0;
         string[] messages = new string[10]
@@ -42,7 +44,6 @@ namespace DevilInTheSky
 
         public void PrintFrame()
         {
-            watch.Start();
             for (int i = 0; i < Console.BufferHeight - 5; i++)// The frame around the play field
             {
                 PrintOnScreen(0, i, "░", ConsoleColor.DarkGray);
@@ -66,13 +67,12 @@ namespace DevilInTheSky
 
             //Elapsed game time 
             watch.Start();
-            TimeSpan elapsedTime = watch.Elapsed;
+            elapsedTime = watch.Elapsed;
             string displayTime = elapsedTime.ToString("mm\\:ss\\.ff");
-
             PrintOnScreen(122, 5,displayTime, ConsoleColor.Red);//The elapsed time
             PrintOnScreen(124, 15, score, ConsoleColor.Red);// Score
             PrintOnScreen(124, 25, "\x0003 "+life, ConsoleColor.Red);// Health
-
+            
             // This prints the messages with a delay
             messageTimer = messageTimer + 1;
             if (messageTimer == 100 || messageTimer == 200 || messageTimer == 300 || messageTimer == 400 || messageTimer == 500 || messageTimer == 600 || messageTimer == 700 || messageTimer == 800 || messageTimer == 900)
