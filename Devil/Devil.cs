@@ -5,25 +5,7 @@ namespace DevilInTheSky
     class Devil
     {
 
-        //static public char[,] turnUp = new char[8, 8]{{' ',' ',' ','*',' ','*',' ',' '},
-        //                                        {' ',' ','*','*',' ','*','*',' '},
-        //                                        {' ',' ','*','*',' ','*','*',' '},
-        //                                        {' ',' ','*','*','*','*','*',' '},
-        //                                        {' ',' ','*','*','*','*','*',' '},
-        //                                        {' ',' ','*','*','*','*','*',' '},
-        //                                        {' ',' ','*','*','*','*','*',' '},
-        //                                        {' ',' ',' ','*','*','*',' ',' '}};
-
-        //static public char[,] turnUpRight = new char[8, 8]{{' ',' ',' ','*',' ','*',' ',' '},
-        //                                            {' ',' ','*','*','*',' ',' ',' '},
-        //                                            {' ','*','*','*',' ',' ',' ','*'},
-        //                                            {'*','*','*','*','*',' ','*','*'},
-        //                                            {'*','*','*','*','*','*','*','*'},
-        //                                            {'*','*','*','*','*','*','*',' '},
-        //                                            {' ','*','*','*','*','*',' ',' '},
-        //                                            {' ',' ',' ','*',' ',' ',' ',' '}
-        //                                            };
- static public char[,] turnUp = new char[8, 8] {{' ',' ',' ','(',' ',')',' ',' '},
+ static public char[,] turnUp = new char[8, 8] {{' ',' ',' ','(',' ',')',' ',' '},  
                                                 {' ',' ',' ',' ','0',' ',' ',' '},
                                                 {' ',' ','*',' ','*',' ','*',' '},
                                                 {' ',' ',' ','*','*','*',' ',' '},
@@ -41,16 +23,21 @@ namespace DevilInTheSky
                                                     {' ','*','*','*','*','*',' ',' '},
                                                     {' ',' ',' ','*',' ',' ',' ',' '}
                                                     };
-        public char[,] imageDevil = turnUp;
-        public Point teleportStartPoint = new Point(1, 1);
+        public char[,] imageDevil = turnUp; 
+        public Point teleportStartPoint = new Point(1, 1); // devil teleporting point when the  frame is touched
         public Point position = new Point(30, 20);// Start position for the devil
         public ConsoleColor color = ConsoleColor.Red; // Devil in  red color 
         public int direction = 0; // move direction (0-up,1-down,2-right,3-left,4-up right,5-up left,6-down right,7-down left
         public int speed = 1;
 
+        public Devil(Point startPosition,int speed, int direction)// defined constructor for Devil class
+        {
+            position = startPosition;
+            this.speed= speed;
+            this.direction = direction;
+        }
 
-
-        public void moveDevil(int nextPosoka)
+        public void moveDevil(int nextPosoka)//increment od decrement x,y cordinates  with speed coeficient 
         {
             if (direction != nextPosoka)
             {
@@ -106,7 +93,8 @@ namespace DevilInTheSky
 
         }
 
-        public char[,] getImage(int posoka)
+        public char[,] getImage(int posoka)// function that rotate turnUp or turnUpRight matrix and return the right image for the devil that depend from direction.
+
         {
             switch (posoka)
             {
@@ -218,8 +206,7 @@ namespace DevilInTheSky
             }
 
 
-        }
-
+        } 
 
     }
 }
