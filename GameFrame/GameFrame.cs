@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Drawing;
 using System.Collections;
 using System.Collections.Generic;
@@ -44,14 +45,14 @@ namespace DevilInTheSky
 
         public void PrintFrame()
         {
-            for (int i = 0; i < Console.BufferHeight - 5; i++)// The frame around the play field
+            for (int i = 0; i < Console.BufferHeight - 4; i++)// The frame around the play field
             {
                 PrintOnScreen(0, i, "░", ConsoleColor.DarkGray);
                 PrintOnScreen(Console.WindowWidth - 30, i, "░", ConsoleColor.DarkGray);
             }
             PrintOnScreen(0, 0, new string('░', Console.WindowWidth - 30), ConsoleColor.DarkGray);
-            PrintOnScreen(0, Console.BufferHeight - 6, new string('░', Console.WindowWidth - 30), ConsoleColor.DarkGray);
-            for (int i = 0; i < Console.BufferHeight - 5; i++)// The frame around the side menu
+            PrintOnScreen(0, Console.BufferHeight - 5, new string('░', Console.WindowWidth - 30), ConsoleColor.DarkGray);
+            for (int i = 0; i < Console.BufferHeight - 4; i++)// The frame around the side menu
             {
                 PrintOnScreen(111, i, "█ █", ConsoleColor.DarkRed);
                 PrintOnScreen(137, i, "█ █", ConsoleColor.DarkRed);
@@ -63,8 +64,10 @@ namespace DevilInTheSky
             }
 
             PrintOnScreen(111, 60, new string('█', 29), ConsoleColor.DarkRed); //The last two lines of the menu
-            PrintOnScreen(111, Console.BufferHeight - 6, new string('█', 29), ConsoleColor.DarkRed);
-
+            PrintOnScreen(111, Console.BufferHeight - 5, new string('█', 29), ConsoleColor.DarkRed);
+        }
+            public void UpdateData()
+            {
             //Elapsed game time 
             watch.Start();
             elapsedTime = watch.Elapsed;
