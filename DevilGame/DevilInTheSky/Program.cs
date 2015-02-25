@@ -20,6 +20,7 @@ namespace DevilInTheSky
         static public int lifes = 6;
         static public string currentName = string.Empty;
         static public int direction = 0;
+        static SoundPlayer devilDie = new SoundPlayer(@"DevilDeath.wav");
 
         static void Main()
         {
@@ -160,7 +161,7 @@ namespace DevilInTheSky
 
                     direction = ChangeDirection(k, firstPressedKey, secondPressedKey);
                     k.moveDevil(direction);
-
+                    k.position = CheckInFrameDevil(k, Console.WindowWidth - 30, Console.BufferHeight - 5);
 
 
                 }
@@ -175,13 +176,24 @@ namespace DevilInTheSky
                     }
 
                     k.moveDevil(direction);
-
+                    k.position = CheckInFrameDevil(k, Console.WindowWidth - 30, Console.BufferHeight - 5);
                 }
 
                 allObjects.Add(bullets);
 
                 PrintRender(allObjects, k, monsters, bullets);
+                if (DevilCollision(k, monsters))
+                {
+                    lifes--;
+                    if (lifes == 0)
+                    {
+                        devilDie.Play();
+                        PrintOnScreen(40, 36, "GAME OVER!", ConsoleColor.Yellow);
 
+                        break;
+                    }
+
+                }
 
                 Thread.Sleep(gameSpeed);
                 allObjects.Clear();
@@ -198,7 +210,99 @@ namespace DevilInTheSky
         }
 
 
+        static Point CheckInFrameDevil(Devil dev, int frameWidth, int frameHeight)
+        {
+            Point teleport = new Point();
+            if (dev.position.X + 7 >= frameWidth ||
+                dev.position.X <= 0 ||
+                (dev.position.Y + 7) >= frameHeight ||
+                dev.position.Y <= 0)
+            {
 
+
+                if (dev.position.X + 8 >= frameWidth)
+                {
+                    teleport.X = 1;
+                    teleport.Y = dev.position.Y;
+                }
+                else
+                    if ((dev.position.Y + 8) >= frameHeight)
+                    {
+                        teleport.Y = 1;
+                        teleport.X = dev.position.X;
+                    }
+                    else
+                        if (dev.position.X <= 0)
+                        {
+                            teleport.X = frameWidth - 1 - 8;
+                            teleport.Y = dev.position.Y;
+                        }
+                        else
+                            if (dev.position.Y <= 0)
+                            {
+                                teleport.Y = frameHeight - 1 - 8;
+                                teleport.X = dev.position.X;
+                            }
+                            else
+                            {
+                                teleport.Y = dev.teleportStartPoint.Y;
+                                teleport.X = dev.teleportStartPoint.X;
+                            }
+
+
+
+                return teleport;
+            }
+            else
+                return dev.position;
+
+        } 
+
+        static bool DevilCollision(Devil dev, List<Monsters> monster)
+        {
+            int touch = 0;
+
+
+            if (dev.direction >= 0 && dev.direction <= 3)
+            {
+                if (dev.direction == 2 || dev.direction == 3)
+                    touch = 1;
+
+                bool left = false;
+                bool right = false;
+                bool top = false;
+                bool bottom = false;
+                bool upleft = false;
+
+                foreach (Monsters a in monster)
+                {
+                    top = ((a.currentPoint.X > dev.position.X && a.currentPoint.X < dev.position.X + 7) &&
+                       ((a.currentPoint.Y + (a.radius * 2) > dev.position.Y + touch) && (a.currentPoint.Y + (2 * a.radius) < dev.position.Y + 7 - touch)));
+
+                    bottom = ((a.currentPoint.X > dev.position.X && a.currentPoint.X < dev.position.X + 7) &&
+                       ((a.currentPoint.Y > dev.position.Y + touch) && (a.currentPoint.Y < dev.position.Y + 7 - touch)));
+
+                    left = ((a.currentPoint.Y > dev.position.Y && a.currentPoint.Y < dev.position.Y + 7) &&
+                       ((a.currentPoint.X + (a.radius * 2) > dev.position.X) && (a.currentPoint.X + (a.radius * 2) < dev.position.X + 7)));
+
+                    right = ((a.currentPoint.Y > dev.position.Y && a.currentPoint.Y < dev.position.Y + 7) &&
+                       ((a.currentPoint.X > dev.position.X) && (a.currentPoint.X < dev.position.X + 7)));
+
+                    upleft = (a.currentPoint.X + (2 * a.radius) > dev.position.X && a.currentPoint.X + (2 * a.radius) < dev.position.X + 7 && a.currentPoint.Y + (2 * a.radius) < dev.position.Y + 7 && a.currentPoint.Y + (2 * a.radius) > dev.position.Y);
+
+
+
+
+                    if (top || left || right || bottom || upleft)
+                    {
+                        monster.Remove(a);
+                        return true;
+                    }
+
+                }
+            }
+            return false;
+        } 
 
         static void PrintRender(List<Object> lst, Devil k, List<Monsters> monster, List<Bullet> bul)
         { //print
