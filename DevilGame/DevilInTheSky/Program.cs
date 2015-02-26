@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Drawing;
 using System.Collections;
@@ -14,13 +14,14 @@ namespace DevilInTheSky
     {
 
         // game settings
-        static public int difficultyLevel = 10;
-        static public int gameSpeed = 100;
-        static public int score = 0;
-        static public int lifes = 6;
-        static public string currentName = string.Empty;
-        static public int direction = 0;
-        static SoundPlayer devilDie = new SoundPlayer(@"DevilDeath.wav");
+       static public int difficultyLevel = 10;
+       static public int gameSpeed = 100;
+       static public int score = 0;
+      static  public int lifes = 6;
+
+      static public string currentName = string.Empty;
+      static SoundPlayer devilDie = new SoundPlayer(@"DevilDeath.wav");
+      static public int direction = 0;
 
         static void Main()
         {
@@ -33,17 +34,16 @@ namespace DevilInTheSky
             {
                 Thread.Sleep(100);
             }
+           
+                
+          
 
-
-
-
-            //  Set Console settings  
-
+              //  Set Console settings  
+       
             Console.CursorVisible = false;
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.BufferHeight = Console.WindowHeight = 100;
+            Console.BufferHeight= Console.WindowHeight = 100;   
             Console.BufferWidth = Console.WindowWidth = 140;
-
 
 
             // define all objects
@@ -51,23 +51,24 @@ namespace DevilInTheSky
             GameFrame frame = new GameFrame();
             List<Bullet> bullets = new List<Bullet>();
             List<Monsters> monsters = new List<Monsters>();
-            Devil k = new Devil(new Point(30, 20), 2, 0);
+            Devil k = new Devil(new Point(30, 20), 2, 0); 
             List<Object> allObjects = new List<Object>();
 
 
             // define all random variables
             Random insertRandomMonster = new Random();
-            Random monsterTypeSpeed = new Random();
+            Random monsterTypeSpeed = new Random();         
             Random monsterColor = new Random();
 
 
 
-            frame.PrintFrame();
+            frame.PrintFrame();                                                                  
+
 
             while (true)
             {
-                frame.UpdateData(score, lifes);
-
+                frame.UpdateData(score,lifes);                                                   
+    
                 // add devil to render
                 allObjects.Add(k);
 
@@ -76,19 +77,18 @@ namespace DevilInTheSky
                 if (difficulty == "01:00" || difficulty == "02:00" || difficulty == "03:00")
                 {
                     difficultyLevel += 2;
-
+                   
                 }
-
-                if (insertRandomMonster.Next(1, 101) <= difficultyLevel)//% probability to insert new asteroid;
+  
+                if(insertRandomMonster.Next(1,101)<=difficultyLevel)//% probability to insert new asteroid;
                 {
                     ConsoleColor monColor = new ConsoleColor();
-                    switch (monsterColor.Next(1, 4))
+                    switch(monsterColor.Next(1,4))
                     {
-                        case 1:
-                            {
-                                monColor = ConsoleColor.Yellow;
-                                break;
-                            }
+                        case 1:{
+                            monColor = ConsoleColor.Yellow;
+                            break;
+                        }
                         case 2:
                             {
                                 monColor = ConsoleColor.Green;
@@ -103,66 +103,73 @@ namespace DevilInTheSky
                     }
 
                     monsters.Add(new Monsters(monColor, monsterTypeSpeed.Next(1, 4), Console.BufferHeight - 5, Console.WindowWidth - 30, monsterTypeSpeed.Next(1, 4)));
-
+                    
                 }
 
-                for (int i = 0; i < monsters.Count; i++)
-                {
-                    monsters[i].moveMonster();
+                    for (int i = 0; i < monsters.Count;i++ )
+                    {
+                        monsters[i].moveMonster();
+                        if (!(CheckInFrameMonster(monsters[i], Console.WindowWidth - 30, Console.BufferHeight - 5)))
+                          {
+                            monsters.Remove(monsters[i]);
+                            if (monsters.Count == 0)
+                                break;
+                        }
+                        
+                    }
 
-                }
-
-                allObjects.Add(monsters);
-
-
-
-                // change the direction if it's necessary
+                    allObjects.Add(monsters);
+                      
+                   
+                   
+                    // change the direction if it's necessary
                 ConsoleKeyInfo secondPressedKey = new ConsoleKeyInfo();
                 if (Console.KeyAvailable)
                 {
                     ConsoleKeyInfo firstPressedKey = Console.ReadKey(true);
 
                     // pause the game;
-                    if (firstPressedKey.KeyChar == 'p')
+                    if(firstPressedKey.KeyChar=='p')
                     {
                         bool wait = true;
-                        while (wait)
+                        while(wait)
                         {
                             if (Console.KeyAvailable)
                                 if (Console.ReadKey(true).KeyChar == 'p')
                                     break;
-                            frame.watch.Stop();
+                            frame.watch.Stop(); 
                             Thread.Sleep(2000);
                         }
                     }
 
-                    if (firstPressedKey.Key == ConsoleKey.Spacebar)
+                    if(firstPressedKey.Key == ConsoleKey.Spacebar)
                     {
-                        AddBullet(bullets, k, direction);
+                        AddBullet(bullets,k, direction);
                     }
 
                     while (Console.KeyAvailable)
                     {
                         secondPressedKey = Console.ReadKey(true);
-                        if (secondPressedKey.Key == ConsoleKey.Spacebar)
+                        if(secondPressedKey.Key==ConsoleKey.Spacebar)
                         {
                             AddBullet(bullets, k, direction);
 
                         }
                     }
 
-                    for (int i = 0; i < bullets.Count; i++)
+                    for( int i=0;i< bullets.Count;i++ )
                     {
                         bullets[i].moveBullet();
-                        if (bullets.Count == 0)
-                            break;
 
+                            if(bullets.Count == 0)
+                                break;
+                        
                     }
 
-                    direction = ChangeDirection(k, firstPressedKey, secondPressedKey);
+                    direction = ChangeDirection(k,firstPressedKey, secondPressedKey);
                     k.moveDevil(direction);
                     k.position = CheckInFrameDevil(k, Console.WindowWidth - 30, Console.BufferHeight - 5);
-
+                    
 
                 }
                 else
@@ -170,8 +177,10 @@ namespace DevilInTheSky
                     for (int i = 0; i < bullets.Count; i++)
                     {
                         bullets[i].moveBullet();
-                        if (bullets.Count == 0)
-                            break;
+
+                       
+                            if (bullets.Count == 0)
+                                break;
 
                     }
 
@@ -181,7 +190,7 @@ namespace DevilInTheSky
 
                 allObjects.Add(bullets);
 
-                PrintRender(allObjects, k, monsters, bullets);
+                PrintRender(allObjects,k,monsters,bullets);
                 if (DevilCollision(k, monsters))
                 {
                     lifes--;
@@ -189,74 +198,26 @@ namespace DevilInTheSky
                     {
                         devilDie.Play();
                         PrintOnScreen(40, 36, "GAME OVER!", ConsoleColor.Yellow);
-
+                
                         break;
                     }
 
                 }
-
+               
                 Thread.Sleep(gameSpeed);
                 allObjects.Clear();
 
-                for (int i = 1; i < 95; i++)        // 95   refresh rate            
+                for (int i = 1; i < 95; i++)        //95 refresh rate
                 {
                     Console.SetCursorPosition(1, i);
                     Console.Write(new String(' ', 109));
                 }
-
+               
             }
-
-
+          
+           
         }
 
-
-        static Point CheckInFrameDevil(Devil dev, int frameWidth, int frameHeight)
-        {
-            Point teleport = new Point();
-            if (dev.position.X + 7 >= frameWidth ||
-                dev.position.X <= 0 ||
-                (dev.position.Y + 7) >= frameHeight ||
-                dev.position.Y <= 0)
-            {
-
-
-                if (dev.position.X + 8 >= frameWidth)
-                {
-                    teleport.X = 1;
-                    teleport.Y = dev.position.Y;
-                }
-                else
-                    if ((dev.position.Y + 8) >= frameHeight)
-                    {
-                        teleport.Y = 1;
-                        teleport.X = dev.position.X;
-                    }
-                    else
-                        if (dev.position.X <= 0)
-                        {
-                            teleport.X = frameWidth - 1 - 8;
-                            teleport.Y = dev.position.Y;
-                        }
-                        else
-                            if (dev.position.Y <= 0)
-                            {
-                                teleport.Y = frameHeight - 1 - 8;
-                                teleport.X = dev.position.X;
-                            }
-                            else
-                            {
-                                teleport.Y = dev.teleportStartPoint.Y;
-                                teleport.X = dev.teleportStartPoint.X;
-                            }
-
-
-
-                return teleport;
-            }
-            else
-                return dev.position;
-
-        } 
 
         static bool DevilCollision(Devil dev, List<Monsters> monster)
         {
@@ -291,6 +252,10 @@ namespace DevilInTheSky
                     upleft = (a.currentPoint.X + (2 * a.radius) > dev.position.X && a.currentPoint.X + (2 * a.radius) < dev.position.X + 7 && a.currentPoint.Y + (2 * a.radius) < dev.position.Y + 7 && a.currentPoint.Y + (2 * a.radius) > dev.position.Y);
 
 
+                    //(a.currentPoint.X+ (2*a.radius)>=dev.position.X && a.currentPoint.X+(2*a.radius)<=dev.position.X+7 && a.currentPoint.Y <=dev.position.Y+7 && a.currentPoint.Y>=dev.position.Y)||
+                    //(a.currentPoint.X>=dev.position.X && a.currentPoint.X<=dev.position.X+7 && a.currentPoint.Y <=dev.position.Y+7 && a.currentPoint.Y>=dev.position.Y)||
+                    //(a.currentPoint.X>=dev.position.X && a.currentPoint.X<=dev.position.X+7 && a.currentPoint.Y+(2*a.radius) <=dev.position.Y+7 && a.currentPoint.Y+(2*a.radius)>=dev.position.Y))
+
 
 
                     if (top || left || right || bottom || upleft)
@@ -302,18 +267,18 @@ namespace DevilInTheSky
                 }
             }
             return false;
-        } 
+        }
 
         static void PrintRender(List<Object> lst, Devil k, List<Monsters> monster, List<Bullet> bul)
         { //print
 
 
-            foreach (Object obj in lst)
+            foreach(Object obj in lst)
             {
-                if (obj.Equals(k))
+                if(obj.Equals(k))
                 {
                     string l = "";
-                    for (int i = 0; i < 8; i++)
+                     for (int i = 0; i < 8; i++)
                     {
 
                         for (int j = 0; j < 8; j++)
@@ -322,7 +287,7 @@ namespace DevilInTheSky
                         }
                         PrintOnScreen(k.position.X, k.position.Y + i, l, k.color);
 
-
+                        
 
                         l = "";
 
@@ -330,16 +295,16 @@ namespace DevilInTheSky
 
                 }
                 else
-                    if (obj.Equals(monster))
+                    if(obj.Equals(monster))
                     {
-                        foreach (Monsters a in (List<Monsters>)obj)
+                        foreach(Monsters a in (List<Monsters>)obj)
                         {
                             a.printMonster();
                         }
                     }
                     else
                     {
-                        foreach (Bullet b in (List<Bullet>)obj)
+                        foreach(Bullet b in (List<Bullet>)obj)
                         {
                             b.printBulet();
                         }
@@ -348,7 +313,7 @@ namespace DevilInTheSky
 
         }
 
-        static void AddBullet(List<Bullet> bulets, Devil k, int direction)
+        static void AddBullet(List<Bullet> bulets,Devil k, int direction )
         {
 
             if (direction == 0)
@@ -372,7 +337,7 @@ namespace DevilInTheSky
                         }
         }
 
-        static int ChangeDirection(Devil k, ConsoleKeyInfo pressedKey, ConsoleKeyInfo pressedSecondKey)
+        static int ChangeDirection(Devil k,ConsoleKeyInfo pressedKey, ConsoleKeyInfo pressedSecondKey)
         {
             if (pressedKey.Key == ConsoleKey.LeftArrow && pressedSecondKey.Key == 0)
             {
@@ -442,9 +407,73 @@ namespace DevilInTheSky
             Console.Write(str);
         }
 
+        static bool CheckInFrameMonster(Monsters monster, int frameWidth, int frameHeight)
+        {
+
+            if (monster.currentPoint.X + (2 * monster.radius) >= frameWidth ||
+                monster.currentPoint.X <= 0 ||
+                (monster.currentPoint.Y + (2 * monster.radius)) >= frameHeight ||
+                monster.currentPoint.Y <= 0)
+            {
+
+                return false;
+            }
+            else
+                return true;
+
+        } // functon that check if the  monster is inside the  frame 
+
+        static Point CheckInFrameDevil(Devil dev, int frameWidth, int frameHeight)
+        {
+            Point teleport = new Point();
+            if (dev.position.X + 7 >= frameWidth ||
+                dev.position.X <= 0 ||
+                (dev.position.Y + 7) >= frameHeight ||
+                dev.position.Y <= 0)
+            {
 
 
-    }
+                if (dev.position.X + 8 >= frameWidth)
+                {
+                    teleport.X = 1;
+                    teleport.Y = dev.position.Y;
+                }
+                else
+                    if ((dev.position.Y + 8) >= frameHeight)
+                    {
+                        teleport.Y = 1;
+                        teleport.X = dev.position.X;
+                    }
+                    else
+                        if (dev.position.X <= 0)
+                        {
+                            teleport.X = frameWidth - 1 - 8;
+                            teleport.Y = dev.position.Y;
+                        }
+                        else
+                            if (dev.position.Y <= 0)
+                            {
+                                teleport.Y = frameHeight - 1 - 8;
+                                teleport.X = dev.position.X;
+                            }
+                            else
+                            {
+                                teleport.Y = dev.teleportStartPoint.Y;
+                                teleport.X = dev.teleportStartPoint.X;
+                            }
 
-}
+
+
+                return teleport;
+            }
+            else
+                return dev.position;
+
+        }
+
+ 
+      }
+
+   }
+
 
