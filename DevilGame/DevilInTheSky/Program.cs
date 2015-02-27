@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading;
 using System.Drawing;
 using System.Collections;
@@ -19,6 +19,7 @@ namespace DevilInTheSky
        static public int score = 0;
       static  public int lifes = 6;
 
+    
       static public string currentName = string.Empty;
       static SoundPlayer devilDie = new SoundPlayer(@"DevilDeath.wav");
       static public int direction = 0;
@@ -35,11 +36,6 @@ namespace DevilInTheSky
                 Thread.Sleep(100);
             }
            
-                
-          
-
-              //  Set Console settings  
-       
             Console.CursorVisible = false;
             Console.ForegroundColor = ConsoleColor.Red;
             Console.BufferHeight= Console.WindowHeight = 100;   
@@ -51,7 +47,8 @@ namespace DevilInTheSky
             GameFrame frame = new GameFrame();
             List<Bullet> bullets = new List<Bullet>();
             List<Monsters> monsters = new List<Monsters>();
-            Devil k = new Devil(new Point(30, 20), 2, 0); 
+            Devil k = new Devil(new Point(30, 20), 2, 0);
+    
             List<Object> allObjects = new List<Object>();
 
 
@@ -161,9 +158,11 @@ namespace DevilInTheSky
                     {
                         bullets[i].moveBullet();
 
-                            if(bullets.Count == 0)
+                        if (!(CheckInFrameBullet(bullets, bullets[i], Console.WindowWidth - 30, Console.BufferHeight - 5) && !BulletCollision(bullets, bullets[i], monsters)))
+                        {
+                            if (bullets.Count == 0)
                                 break;
-                        
+                        }
                     }
 
                     direction = ChangeDirection(k,firstPressedKey, secondPressedKey);
@@ -178,10 +177,11 @@ namespace DevilInTheSky
                     {
                         bullets[i].moveBullet();
 
-                       
+                        if (!(CheckInFrameBullet(bullets, bullets[i], Console.WindowWidth - 30, Console.BufferHeight - 5) && !BulletCollision(bullets, bullets[i], monsters)))
+                        {
                             if (bullets.Count == 0)
                                 break;
-
+                        }
                     }
 
                     k.moveDevil(direction);
@@ -189,6 +189,7 @@ namespace DevilInTheSky
                 }
 
                 allObjects.Add(bullets);
+            
 
                 PrintRender(allObjects,k,monsters,bullets);
                 if (DevilCollision(k, monsters))
@@ -198,7 +199,7 @@ namespace DevilInTheSky
                     {
                         devilDie.Play();
                         PrintOnScreen(40, 36, "GAME OVER!", ConsoleColor.Yellow);
-                
+                    
                         break;
                     }
 
@@ -269,16 +270,16 @@ namespace DevilInTheSky
             return false;
         }
 
-        static void PrintRender(List<Object> lst, Devil k, List<Monsters> monster, List<Bullet> bul)
+        static void PrintRender(List<Object> lst, Devil k, List<Monsters> monster, List<Bullet> bul) 
         { //print
 
 
-            foreach(Object obj in lst)
+            foreach (Object obj in lst)
             {
-                if(obj.Equals(k))
+                if (obj.Equals(k))
                 {
                     string l = "";
-                     for (int i = 0; i < 8; i++)
+                    for (int i = 0; i < 8; i++)
                     {
 
                         for (int j = 0; j < 8; j++)
@@ -287,7 +288,7 @@ namespace DevilInTheSky
                         }
                         PrintOnScreen(k.position.X, k.position.Y + i, l, k.color);
 
-                        
+
 
                         l = "";
 
@@ -295,22 +296,32 @@ namespace DevilInTheSky
 
                 }
                 else
-                    if(obj.Equals(monster))
+                    if (obj.Equals(monster))
                     {
-                        foreach(Monsters a in (List<Monsters>)obj)
+                        foreach (Monsters a in (List<Monsters>)obj)
                         {
                             a.printMonster();
                         }
                     }
                     else
                     {
-                        foreach(Bullet b in (List<Bullet>)obj)
+                        foreach (Bullet b in (List<Bullet>)obj)
                         {
                             b.printBulet();
                         }
                     }
             }
 
+        }
+
+        static bool CheckInFrameBullet(List<Bullet> lst, Bullet bul, int frameWidth, int frameHeight) 
+        {
+            if (bul.position.X <= 0 || bul.position.X >= frameWidth || bul.position.Y <= 0 || bul.position.Y >= frameHeight)
+            {
+                lst.Remove(bul);
+                return false;
+            }
+            return true;
         }
 
         static void AddBullet(List<Bullet> bulets,Devil k, int direction )
@@ -407,13 +418,13 @@ namespace DevilInTheSky
             Console.Write(str);
         }
 
-        static bool CheckInFrameMonster(Monsters monster, int frameWidth, int frameHeight)
+        static bool CheckInFrameMonster(Monsters astero, int frameWidth, int frameHeight)
         {
 
-            if (monster.currentPoint.X + (2 * monster.radius) >= frameWidth ||
-                monster.currentPoint.X <= 0 ||
-                (monster.currentPoint.Y + (2 * monster.radius)) >= frameHeight ||
-                monster.currentPoint.Y <= 0)
+            if (astero.currentPoint.X + (2 * astero.radius) >= frameWidth ||
+                astero.currentPoint.X <= 0 ||
+                (astero.currentPoint.Y + (2 * astero.radius)) >= frameHeight ||
+                astero.currentPoint.Y <= 0)
             {
 
                 return false;
@@ -421,7 +432,7 @@ namespace DevilInTheSky
             else
                 return true;
 
-        } // functon that check if the  monster is inside the  frame 
+        } 
 
         static Point CheckInFrameDevil(Devil dev, int frameWidth, int frameHeight)
         {
@@ -471,9 +482,41 @@ namespace DevilInTheSky
 
         }
 
+        static bool BulletCollision(List<Bullet>blst, Bullet bul,List<Monsters> ast) // this function check if some of monsters is killed
+        {
+            for (int i = 0; i < ast.Count; i++)
+            {
+                if (bul.position.X >= ast[i].currentPoint.X &&
+                    bul.position.X <= ast[i].currentPoint.X + (ast[i].radius * 2) &&
+                    bul.position.Y >= ast[i].currentPoint.Y &&
+                    bul.position.Y <= ast[i].currentPoint.Y + (ast[i].radius * 2))
+                {
+                    blst.Remove(bul);
+                   
+                    if (ast[i].radius == 1)
+                    {
+                        score += 3;
+                    }
+                    else
+                        if (ast[i].radius == 2)
+                        {
+                            score += 2;
+                        }
+                        else score++;
+                  
+                    ast.Remove(ast[i]);
+                    return true;
+                }
+                
+            }
+            return false;
+                
+        } 
+
+    
+
+        
  
       }
 
    }
-
-
