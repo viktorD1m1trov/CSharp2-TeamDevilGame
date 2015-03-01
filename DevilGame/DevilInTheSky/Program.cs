@@ -513,10 +513,119 @@ namespace DevilInTheSky
                 
         } 
 
-    
+		static string GetPlayerName()
+        {
+            PrintOnScreen(40, 38, "ENTER YOUR NAME: ", ConsoleColor.Gray);
+            Console.CursorVisible = true;
+            string name = Console.ReadLine().Trim();
+            Console.CursorVisible = false;
+            return name.ToUpper();
+        }
 
-        
- 
+        static List<string> LoadSaveFile()
+        {
+            int counter = 0;
+            List<string> saves = new List<string>();
+            int yCord = 2;      //var increases every cycle to print score on the next row
+
+            try
+            {
+                PrintOnScreen(40, 42, "HIGHSCORES", ConsoleColor.Green);
+
+                StreamReader reader = new StreamReader(highscoreFilePath);
+                using (reader)
+                {
+                    string line = reader.ReadLine();
+                    while (counter < 5 && line != null)
+                    {
+                        saves.Add(line);
+
+                        var lineScore = new List<char>();
+                        for (int i = 0; i < line.Length; i++)
+                        {
+                            if (char.IsDigit(line[i]))
+                            {
+                                lineScore.Add(line[i]);
+                            }
+                        }
+
+                        if (score == int.Parse(string.Join("", lineScore)))  //highlight current score when printing
+                        {
+                            PrintOnScreen(40, 43 + yCord, line, ConsoleColor.Green);
+                        }
+                        else if (counter == 4 && score < int.Parse(string.Join("", lineScore)))
+                        {
+                            PrintOnScreen(35, 43 + yCord, "YOUR SCORE IS TOO LOW FOR THE HIGHSCORE LIST", ConsoleColor.Red);
+                        }
+                        else
+                        {
+                            PrintOnScreen(40, 43 + yCord, line, ConsoleColor.White);
+                        }
+
+                        line = reader.ReadLine();
+                        yCord += 2;
+                        counter++;
+                    }
+                }
+            }
+            catch (FileNotFoundException)
+            {
+                Console.WriteLine("Highscore file not found!");
+            }
+            catch (DirectoryNotFoundException)
+            {
+                Console.WriteLine("Directory for highscore file not found!");
+            }
+            return saves;
+        }
+
+        static void AddHighscore(int score, string playerName)
+        {
+            SortedDictionary<int, string> dictionary = new SortedDictionary<int, string>();
+            int some = score;
+            StreamReader reader = new StreamReader(highscoreFilePath);
+            using (reader)
+            {
+                string line = reader.ReadLine();
+
+                while (line != null)
+                {
+                    int spaceIndex = line.IndexOf(' ');         //separate score from user's name
+                    int highScore = int.Parse(line.Substring(0, spaceIndex));
+                    string userName = line.Substring(spaceIndex).Trim();
+
+                    if (!dictionary.ContainsKey(score))
+                    {
+                        dictionary.Add(highScore, userName);
+                    }
+                    else
+                    {
+                        dictionary[score] = userName;
+                    }
+                    line = reader.ReadLine();
+                }
+            }
+
+            if (!dictionary.ContainsKey(score))
+            {
+                dictionary.Add(score, playerName);
+            }
+            else
+            {
+                dictionary[score] = playerName;
+            }
+
+            var descendingDic = dictionary.Reverse();      //reverse the list to print the highest score first 
+
+
+            StreamWriter write = new StreamWriter(highscoreFilePath);
+            using (write)
+            {
+                foreach (var item in descendingDic)
+                {
+                    write.WriteLine(item.Key + " " + item.Value);
+                }
+            }
+        }
       }
-
    }
