@@ -17,9 +17,9 @@ namespace DevilInTheSky
        static public int difficultyLevel = 10;
        static public int gameSpeed = 100;
        static public int score = 0;
-      static  public int lifes = 6;
+      static  public int lifes = 5;
 
-    
+      static public string highscoreFilePath = @"..\..\highscores.txt";
       static public string currentName = string.Empty;
       static SoundPlayer devilDie = new SoundPlayer(@"DevilDeath.wav");
       static public int direction = 0;
@@ -36,6 +36,11 @@ namespace DevilInTheSky
                 Thread.Sleep(100);
             }
            
+                
+          
+
+              //  Set Console settings  
+       
             Console.CursorVisible = false;
             Console.ForegroundColor = ConsoleColor.Red;
             Console.BufferHeight= Console.WindowHeight = 100;   
@@ -77,7 +82,7 @@ namespace DevilInTheSky
                    
                 }
   
-                if(insertRandomMonster.Next(1,101)<=difficultyLevel)//% probability to insert new asteroid;
+                if(insertRandomMonster.Next(1,101)<=difficultyLevel)//% probability to insert new monster;
                 {
                     ConsoleColor monColor = new ConsoleColor();
                     switch(monsterColor.Next(1,4))
@@ -189,7 +194,7 @@ namespace DevilInTheSky
                 }
 
                 allObjects.Add(bullets);
-            
+                
 
                 PrintRender(allObjects,k,monsters,bullets);
                 if (DevilCollision(k, monsters))
@@ -198,8 +203,18 @@ namespace DevilInTheSky
                     if (lifes == 0)
                     {
                         devilDie.Play();
+                       
                         PrintOnScreen(40, 36, "GAME OVER!", ConsoleColor.Yellow);
-                    
+                        PrintOnScreen(40, 48, " ", ConsoleColor.Yellow);
+
+                       AddHighscore(score, GetPlayerName());      
+
+
+                       LoadSaveFile();
+                      
+                        PrintOnScreen(35, 34, "RESTART THE GAME Y/N ?", ConsoleColor.Red);
+
+
                         break;
                     }
 
@@ -215,7 +230,30 @@ namespace DevilInTheSky
                 }
                
             }
-          
+           
+            // restart the  game.If pressed 'y'  the  game  will restart
+
+            char input = new char();
+            while (true)
+            {
+                if (Console.KeyAvailable)
+                    if ((input = Console.ReadKey(true).KeyChar) == 'n')
+                        break;
+                    else
+                        if (input == 'y')
+                        {
+                            Console.Clear();
+                            difficultyLevel = 10;
+                            lifes = 6;
+                            score = 0;
+
+                            Main();
+                            break;
+                        }
+                frame.watch.Stop();
+                Thread.Sleep(1000);
+
+            }
            
         }
 
@@ -253,10 +291,6 @@ namespace DevilInTheSky
                     upleft = (a.currentPoint.X + (2 * a.radius) > dev.position.X && a.currentPoint.X + (2 * a.radius) < dev.position.X + 7 && a.currentPoint.Y + (2 * a.radius) < dev.position.Y + 7 && a.currentPoint.Y + (2 * a.radius) > dev.position.Y);
 
 
-                    //(a.currentPoint.X+ (2*a.radius)>=dev.position.X && a.currentPoint.X+(2*a.radius)<=dev.position.X+7 && a.currentPoint.Y <=dev.position.Y+7 && a.currentPoint.Y>=dev.position.Y)||
-                    //(a.currentPoint.X>=dev.position.X && a.currentPoint.X<=dev.position.X+7 && a.currentPoint.Y <=dev.position.Y+7 && a.currentPoint.Y>=dev.position.Y)||
-                    //(a.currentPoint.X>=dev.position.X && a.currentPoint.X<=dev.position.X+7 && a.currentPoint.Y+(2*a.radius) <=dev.position.Y+7 && a.currentPoint.Y+(2*a.radius)>=dev.position.Y))
-
 
 
                     if (top || left || right || bottom || upleft)
@@ -270,7 +304,7 @@ namespace DevilInTheSky
             return false;
         }
 
-        static void PrintRender(List<Object> lst, Devil k, List<Monsters> monster, List<Bullet> bul) 
+        static void PrintRender(List<Object> lst, Devil k, List<Monsters> monster, List<Bullet> bul)
         { //print
 
 
@@ -314,7 +348,7 @@ namespace DevilInTheSky
 
         }
 
-        static bool CheckInFrameBullet(List<Bullet> lst, Bullet bul, int frameWidth, int frameHeight) 
+        static bool CheckInFrameBullet(List<Bullet> lst, Bullet bul, int frameWidth, int frameHeight)
         {
             if (bul.position.X <= 0 || bul.position.X >= frameWidth || bul.position.Y <= 0 || bul.position.Y >= frameHeight)
             {
@@ -482,7 +516,7 @@ namespace DevilInTheSky
 
         }
 
-        static bool BulletCollision(List<Bullet>blst, Bullet bul,List<Monsters> ast) // this function check if some of monsters is killed
+        static bool BulletCollision(List<Bullet>blst, Bullet bul,List<Monsters> ast) 
         {
             for (int i = 0; i < ast.Count; i++)
             {
@@ -512,8 +546,8 @@ namespace DevilInTheSky
             return false;
                 
         } 
-
-	static string GetPlayerName()
+    
+        static string GetPlayerName()                                       
         {
             PrintOnScreen(40, 38, "ENTER YOUR NAME: ", ConsoleColor.Gray);
             Console.CursorVisible = true;
@@ -521,13 +555,12 @@ namespace DevilInTheSky
             Console.CursorVisible = false;
             return name.ToUpper();
         }
-
-        static List<string> LoadSaveFile()
+   
+        static List<string> LoadSaveFile()                                  
         {
             int counter = 0;
             List<string> saves = new List<string>();
             int yCord = 2;      //var increases every cycle to print score on the next row
-
             try
             {
                 PrintOnScreen(40, 42, "HIGHSCORES", ConsoleColor.Green);
@@ -566,20 +599,22 @@ namespace DevilInTheSky
                         yCord += 2;
                         counter++;
                     }
+
+                    
                 }
             }
             catch (FileNotFoundException)
             {
-                Console.WriteLine("Highscore file not found!");
+                throw new FileNotFoundException();
             }
             catch (DirectoryNotFoundException)
             {
-                Console.WriteLine("Directory for highscore file not found!");
+                throw new DirectoryNotFoundException();
             }
             return saves;
         }
-
-        static void AddHighscore(int score, string playerName)
+  
+        static void AddHighscore(int score, string playerName)                  
         {
             SortedDictionary<int, string> dictionary = new SortedDictionary<int, string>();
             int some = score;
@@ -587,13 +622,11 @@ namespace DevilInTheSky
             using (reader)
             {
                 string line = reader.ReadLine();
-
                 while (line != null)
                 {
                     int spaceIndex = line.IndexOf(' ');         //separate score from user's name
                     int highScore = int.Parse(line.Substring(0, spaceIndex));
                     string userName = line.Substring(spaceIndex).Trim();
-
                     if (!dictionary.ContainsKey(score))
                     {
                         dictionary.Add(highScore, userName);
@@ -627,5 +660,10 @@ namespace DevilInTheSky
                 }
             }
         }
+
+        
+ 
       }
+
    }
+
