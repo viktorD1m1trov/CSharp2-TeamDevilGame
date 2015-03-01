@@ -247,6 +247,7 @@ namespace DevilInTheSky
                             lifes = 6;
                             score = 0;
 
+
                             Main();
                             break;
                         }
