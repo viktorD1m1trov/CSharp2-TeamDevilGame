@@ -513,7 +513,7 @@ namespace DevilInTheSky
                 
         } 
 
-		static string GetPlayerName()
+	static string GetPlayerName()
         {
             PrintOnScreen(40, 38, "ENTER YOUR NAME: ", ConsoleColor.Gray);
             Console.CursorVisible = true;
